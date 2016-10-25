@@ -1,0 +1,101 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files\\nodejs\\node.exe',
+1 verbose cli   'C:\\Users\\Zach and Andrea\\AppData\\Roaming\\npm\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'publish' ]
+2 info using npm@3.10.8
+3 info using node@v6.8.1
+4 verbose publish [ '.' ]
+5 silly cache add args [ '.', null ]
+6 verbose cache add spec .
+7 silly cache add parsed spec Result {
+7 silly cache add   raw: '.',
+7 silly cache add   scope: null,
+7 silly cache add   escapedName: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: '.',
+7 silly cache add   spec: 'C:\\Users\\Zach and Andrea\\projects\\js\\jackalope',
+7 silly cache add   type: 'directory' }
+8 verbose addLocalDirectory C:\Users\Zach and Andrea\AppData\Roaming\npm-cache\jackalope\0.1.0-alpha\package.tgz not in flight; packing
+9 verbose correctMkdir C:\Users\Zach and Andrea\AppData\Roaming\npm-cache correctMkdir not in flight; initializing
+10 info lifecycle jackalope@0.1.0-alpha~prepublish: jackalope@0.1.0-alpha
+11 silly lifecycle jackalope@0.1.0-alpha~prepublish: no script for prepublish, continuing
+12 verbose tar pack [ 'C:\\Users\\Zach and Andrea\\AppData\\Roaming\\npm-cache\\jackalope\\0.1.0-alpha\\package.tgz',
+12 verbose tar pack   'C:\\Users\\Zach and Andrea\\projects\\js\\jackalope' ]
+13 verbose tarball C:\Users\Zach and Andrea\AppData\Roaming\npm-cache\jackalope\0.1.0-alpha\package.tgz
+14 verbose folder C:\Users\Zach and Andrea\projects\js\jackalope
+15 verbose addLocalTarball adding from inside cache C:\Users\Zach and Andrea\AppData\Roaming\npm-cache\jackalope\0.1.0-alpha\package.tgz
+16 verbose correctMkdir C:\Users\Zach and Andrea\AppData\Roaming\npm-cache correctMkdir not in flight; initializing
+17 silly cache afterAdd jackalope@0.1.0-alpha
+18 verbose afterAdd C:\Users\Zach and Andrea\AppData\Roaming\npm-cache\jackalope\0.1.0-alpha\package\package.json not in flight; writing
+19 verbose correctMkdir C:\Users\Zach and Andrea\AppData\Roaming\npm-cache correctMkdir not in flight; initializing
+20 verbose afterAdd C:\Users\Zach and Andrea\AppData\Roaming\npm-cache\jackalope\0.1.0-alpha\package\package.json written
+21 silly publish { name: 'jackalope',
+21 silly publish   version: '0.1.0-alpha',
+21 silly publish   description: 'SAM pattern utility utilizing streams',
+21 silly publish   main: 'index.js',
+21 silly publish   scripts: { test: 'echo "Error: no test specified" && exit 1' },
+21 silly publish   author: { name: 'Zach Dahl', email: 'z.schtauffen@gmail.com' },
+21 silly publish   license: 'ISC',
+21 silly publish   readme: 'ERROR: No README data found!',
+21 silly publish   _id: 'jackalope@0.1.0-alpha',
+21 silly publish   _shasum: 'aa46f47519223a44b5e35164ba861cb443da35ab',
+21 silly publish   _from: '.' }
+22 verbose getPublishConfig undefined
+23 silly mapToRegistry name jackalope
+24 silly mapToRegistry using default registry
+25 silly mapToRegistry registry https://registry.npmjs.org/
+26 silly mapToRegistry data Result {
+26 silly mapToRegistry   raw: 'jackalope',
+26 silly mapToRegistry   scope: null,
+26 silly mapToRegistry   escapedName: 'jackalope',
+26 silly mapToRegistry   name: 'jackalope',
+26 silly mapToRegistry   rawSpec: '',
+26 silly mapToRegistry   spec: 'latest',
+26 silly mapToRegistry   type: 'tag' }
+27 silly mapToRegistry uri https://registry.npmjs.org/jackalope
+28 verbose publish registryBase https://registry.npmjs.org/
+29 silly publish uploading C:\Users\Zach and Andrea\AppData\Roaming\npm-cache\jackalope\0.1.0-alpha\package.tgz
+30 verbose request uri https://registry.npmjs.org/jackalope
+31 verbose request sending authorization for write operation
+32 info attempt registry request try #1 at 12:59:11 AM
+33 verbose request using bearer token for auth
+34 verbose request id 1b028440c0fccffd
+35 http request PUT https://registry.npmjs.org/jackalope
+36 http 403 https://registry.npmjs.org/jackalope
+37 verbose headers { 'content-type': 'application/json',
+37 verbose headers   'cache-control': 'max-age=300',
+37 verbose headers   'content-length': '103',
+37 verbose headers   'accept-ranges': 'bytes',
+37 verbose headers   date: 'Tue, 25 Oct 2016 05:59:11 GMT',
+37 verbose headers   via: '1.1 varnish',
+37 verbose headers   connection: 'keep-alive',
+37 verbose headers   'x-served-by': 'cache-ord1725-ORD',
+37 verbose headers   'x-cache': 'MISS',
+37 verbose headers   'x-cache-hits': '0',
+37 verbose headers   'x-timer': 'S1477375150.325742,VS0,VE703',
+37 verbose headers   vary: 'Accept-Encoding' }
+38 verbose request invalidating C:\Users\Zach and Andrea\AppData\Roaming\npm-cache\registry.npmjs.org\jackalope on PUT
+39 error publish Failed PUT 403
+40 verbose stack Error: you do not have permission to publish "jackalope". Are you logged in as the correct user? : jackalope
+40 verbose stack     at makeError (C:\Users\Zach and Andrea\AppData\Roaming\npm\node_modules\npm\node_modules\npm-registry-client\lib\request.js:302:12)
+40 verbose stack     at CachingRegistryClient.<anonymous> (C:\Users\Zach and Andrea\AppData\Roaming\npm\node_modules\npm\node_modules\npm-registry-client\lib\request.js:290:14)
+40 verbose stack     at Request._callback (C:\Users\Zach and Andrea\AppData\Roaming\npm\node_modules\npm\node_modules\npm-registry-client\lib\request.js:210:14)
+40 verbose stack     at Request.self.callback (C:\Users\Zach and Andrea\AppData\Roaming\npm\node_modules\npm\node_modules\request\request.js:187:22)
+40 verbose stack     at emitTwo (events.js:106:13)
+40 verbose stack     at Request.emit (events.js:191:7)
+40 verbose stack     at Request.<anonymous> (C:\Users\Zach and Andrea\AppData\Roaming\npm\node_modules\npm\node_modules\request\request.js:1044:10)
+40 verbose stack     at emitOne (events.js:96:13)
+40 verbose stack     at Request.emit (events.js:188:7)
+40 verbose stack     at IncomingMessage.<anonymous> (C:\Users\Zach and Andrea\AppData\Roaming\npm\node_modules\npm\node_modules\request\request.js:965:12)
+41 verbose statusCode 403
+42 verbose pkgid jackalope
+43 verbose cwd C:\Users\Zach and Andrea\projects\js\jackalope
+44 error Windows_NT 10.0.14390
+45 error argv "C:\\Program Files\\nodejs\\node.exe" "C:\\Users\\Zach and Andrea\\AppData\\Roaming\\npm\\node_modules\\npm\\bin\\npm-cli.js" "publish"
+46 error node v6.8.1
+47 error npm  v3.10.8
+48 error code E403
+49 error you do not have permission to publish "jackalope". Are you logged in as the correct user? : jackalope
+50 error If you need help, you may report this error at:
+50 error     <https://github.com/npm/npm/issues>
+51 verbose exit [ 1, true ]

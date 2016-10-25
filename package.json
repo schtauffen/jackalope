@@ -1,0 +1,11 @@
+{
+  "name": "jackalope/core",
+  "version": "0.1.0-alpha",
+  "description": "SAM pattern utility utilizing streams",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Zach Dahl <z.schtauffen@gmail.com>",
+  "license": "ISC"
+}
