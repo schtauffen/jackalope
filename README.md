@@ -1,5 +1,5 @@
 # Jackalope
-A [SAM](http://sam.js.org/)-patterned (redux)[https://github.com/reactjs/redux]-like state management utility utilizing streams
+A [SAM](http://sam.js.org/)-patterned [redux](https://github.com/reactjs/redux)-like state management utility utilizing streams
 
 
 ## Installation
@@ -29,6 +29,9 @@ export default J
 
 **TODO**: more to come
 
-### Disclaimer:
-Jackalope has been created mostly to learn about and play with the [SAM pattern](http://sam.js.org/)
+## Disclaimer
+Jackalope has been created mostly to learn about and play with the [SAM pattern](http://sam.js.org/).  
 As is, there are no tests or plans for long term support. This may change pending on how useful this implementation is :)
+
+## License
+Jackalope is licensed under the [ISC license](https://opensource.org/licenses/ISC)
