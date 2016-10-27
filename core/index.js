@@ -21,7 +21,7 @@
 
     var present = function (action ) {
       model.present(action)
-      J.state(state(model))
+      J.state(state(model, J))
     }
 
     if (middleware) {
@@ -38,7 +38,7 @@
     return J
   }
 
-  Jackalope.version = '0.2.0'
+  Jackalope.version = '0.2.1'
   Jackalope.INIT = '@@jackalope/init'
 
   Jackalope.createAction = function (type, fn) {

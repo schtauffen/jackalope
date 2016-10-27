@@ -96,12 +96,8 @@ actions.setCount = (n) => ({
 export default actions
 ```
 
-### Using a jackalope instance
-**TODO**
-
-
-## Helpers included in Core
-**TODO**
+### Jackalope Core
+[https://github.com/schtauffen/jackalope/tree/master/core](https://github.com/schtauffen/jackalope/tree/master/core)
 
 
 ## Composability
