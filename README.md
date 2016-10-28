@@ -1,6 +1,6 @@
 # Jackalope
-A modular and microscopic [SAM](http://sam.js.org/)-patterned container
-It is also inspired in parts by [redux](https://github.com/reactjs/redux)
+A modular and microscopic [SAM](http://sam.js.org/)-patterned container  
+It is inspired by [redux](https://github.com/reactjs/redux)  
 
 
 ## Installation
@@ -27,9 +27,8 @@ const J = Jackalope({ state, actions, model })
 
 
 ### State
-In Jackalope, `state` is assumed to have curried form `actions => model => { ... }`.  
+In Jackalope, `state` is assumed to be a function with curried form `actions => model => { ... }`.  
 State is responsible for rendering and determing automatic actions, if any.  
-For simple apps, state may be unnessecary and is optional.  
 
 Example:
 ```js
@@ -57,7 +56,7 @@ export default state
 `model` is an object which contains your data. It must have a method, `model.present` which can either accept an action and update itself, or reject actions outright.  
 `model.present` is assumed to have curried form `display => action => { ... }`  
 
-**IMPORTTANT** : `model.present` is the only function allowed to mutate model in the SAM pattern.
+**IMPORTANT** : `model.present` is the only function allowed to mutate model in the SAM pattern.
 
 Example:
 ```js
@@ -102,10 +101,11 @@ export default actions
 [https://github.com/schtauffen/jackalope/tree/master/core](https://github.com/schtauffen/jackalope/tree/master/core)
 
 ## Extending Jackalope
-**TODO - information coming**
+**TODO - more information coming**
 
 ## Composability
-SAM apps are meant to be composable. **TODO - More to come**
+SAM apps are meant to be composable.  
+**TODO - More to come**
 
 
 ## Disclaimer
