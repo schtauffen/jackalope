@@ -1,5 +1,6 @@
 # Jackalope
-A [SAM](http://sam.js.org/)-patterned [redux](https://github.com/reactjs/redux)-like state management utility utilizing streams
+A modular and microscopic [SAM](http://sam.js.org/)-patterned container
+It is also inspired in parts by [redux](https://github.com/reactjs/redux)
 
 
 ## Installation
@@ -20,34 +21,32 @@ import Jackalope from '@jackalope/core'
 import state from './state'
 import actions from './actions'
 import model from './model'
-import middleware from './middleware'
 
-const J = Jackalope({ state, actions, model }, middleware)
-
-export default J
+const J = Jackalope({ state, actions, model })
 ```
 
 
 ### State
-In Jackalope, `state` is assumed to be a pure function which returns the computed state of your app.  
+In Jackalope, `state` is assumed to have curried form `actions => model => { ... }`.  
+State is responsible for rendering and determing automatic actions, if any.  
 For simple apps, state may be unnessecary and is optional.  
-**Note: there is not yet a direct analogy to `nap` in Jackalope; However, through middleware we have other means of deciding when more actions should take place**  
 
 Example:
 ```js
 // src/state.js
-const state = (model) => {
-  const state = {}
+const state = (actions) => (model) => {
+  const representation = 'Oops, you\'ve stumbled upon an impossible state'
 
   if (model.count > 0) {
-    state.isCounting = true
+    representation = view.counting(model, actions)
   } else if (model.count < 1) {
-    state.hasLaunched = true
+    representation = view.launching(model, actions)
   }
 
   ...
 
-  return state
+  view.render(representation)
+  nap(model, actions)
 }
 
 export default state
@@ -56,6 +55,9 @@ export default state
 
 ### Model
 `model` is an object which contains your data. It must have a method, `model.present` which can either accept an action and update itself, or reject actions outright.  
+`model.present` is assumed to have curried form `display => action => { ... }`  
+
+**IMPORTTANT** : `model.present` is the only function allowed to mutate model in the SAM pattern.
 
 Example:
 ```js
@@ -80,7 +82,7 @@ export default model
 
 ### Actions
 `actions` should be an object containing pure functions that return instructions for how to update the model.  
-They can be redux-like (as in the examples here) containing `type` and `payload`, but they don't have to be.  
+They can be redux-like (as in the following example) containing `type` and `payload`, but they don't have to be.  
 
 ```js
 // src/actions.js
@@ -99,6 +101,8 @@ export default actions
 ### Jackalope Core
 [https://github.com/schtauffen/jackalope/tree/master/core](https://github.com/schtauffen/jackalope/tree/master/core)
 
+## Extending Jackalope
+**TODO - information coming**
 
 ## Composability
 SAM apps are meant to be composable. **TODO - More to come**

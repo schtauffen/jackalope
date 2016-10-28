@@ -2,7 +2,7 @@
 
 ## Usage
 ```js
-const J = Jackalope({ state, actions, model }, middleware)
+const J = Jackalope({ state, actions, model })
 ```
 
 
