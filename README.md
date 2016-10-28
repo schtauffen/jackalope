@@ -22,7 +22,7 @@ import state from './state'
 import actions from './actions'
 import model from './model'
 
-const J = Jackalope({ state, actions, model })
+const J = Jackalope({ state, actions, model }/*, plugins */)
 ```
 
 
@@ -61,9 +61,12 @@ export default state
 Example:
 ```js
 // src/model.js
-const model = {}
+const model = {
+  count: 10,
+  ...
+}
 
-model.present = (action) => {
+model.present = (display) => (action) => {
   if (action.type === 'SET_COUNT' && typeof action.payload === 'number') {
     model.count = action.payload
   }
@@ -73,6 +76,8 @@ model.present = (action) => {
   }
 
   ...
+  
+  display(model)
 }
 
 export default model
@@ -81,7 +86,7 @@ export default model
 
 ### Actions
 `actions` should be an object containing pure functions that return instructions for how to update the model.  
-They can be redux-like (as in the following example) containing `type` and `payload`, but they don't have to be.  
+They can be redux-like (as in the following example), but they don't have to be.  
 
 ```js
 // src/actions.js
