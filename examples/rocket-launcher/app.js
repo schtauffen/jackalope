@@ -55,7 +55,7 @@
    *
    * Jackalope expects:
    *  1) present to be available on model
-   *  2) present to the curried structure: display => action => {...}
+   *  2) present to have curried structure: display => action => {...}
    *  3) present to call "display(model)" to trigger state
    *
    * model.present is the only thing allowed to change model
