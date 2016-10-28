@@ -3,36 +3,32 @@
    * actions are responsible for proposing updates
    * to model
    *
-   * Though you can manually present them to model.present,
-   * Jackalope will automatically wrap them to do so if you pass
-   * them in.
-   *
-   * Jackalope assumes actions will be synchronous and return
-   * objects to be presented to the model. For async, they can
-   * be called from within wrapping asynchronous functions, or
-   * preferably handled in one of the optional plugins,
-   * such as @jackalope/async
+   * Jackalope assumes actions is function that returns
+   * an object. The lone argument to the function is
+   * present, which should be invoked in each action
    */
-  var actions = {
-    start: function () {
-      return { started: true }
-    },
+  var actions = function (present) {
+    return {
+      start: function () {
+        present({ started: true })
+      },
 
-    abort: function () {
-      return { aborted: true }
-    },
+      abort: function () {
+        present({ aborted: true })
+      },
 
-    launch: function () {
-      return { launched: true }
-    },
+      launch: function () {
+        present({ launched: true })
+      },
 
-    decrement: function (counter) {
-      return { counter: counter - 1 }
-    },
+      decrement: function (counter) {
+        present({ counter: counter - 1 })
+      },
 
-    reset: function () {
-      return { reset: true }
-    },
+      reset: function () {
+        present({ reset: true })
+      },
+    }
   }
 
   /**
@@ -113,11 +109,9 @@
    *  2) rendering views with those view models
    *  3) determing if automatic action should occur
    *
-   * Jackalope expects it to be a curried function of form:
-   *  actions => model => { ... }
-   *
-   * Actions are provided as the first of the curried params
-   * so views and the nap functions can have access
+   * Jackalope expects it to be a function which accepts the model
+   * If 0 or > 1 function params are declared, the bound actions
+   * are also available
    */
   state.representation = function (model) {
     if (model.launched)
@@ -149,18 +143,21 @@
     }
   }
 
-  function state (actions) {
-    return function (model) {
-      var rendered = state.representation(model)
-      view(rendered)
-      state.nap(model, actions)
-    }
+  function state (model, actions) {
+    var rendered = state.representation(model)
+    view(rendered)
+    state.nap(model, actions)
   }
 
   /**
    * Jackalope will automatically initialize the SAM application
    */
-  var J = Jackalope({ state: state, actions: actions, model: model })
+  var J = Jackalope({ state: state, actions: actions, model: model }, [
+    J => next => action => {
+        next(action)
+        console.log(action)
+    }
+  ])
 
   // View libraries usually have nicer ways to add events :)
   document.addEventListener('click', function (evt) {
