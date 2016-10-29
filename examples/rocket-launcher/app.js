@@ -152,12 +152,7 @@
   /**
    * Jackalope will automatically initialize the SAM application
    */
-  var J = Jackalope({ state: state, actions: actions, model: model }, [
-    J => next => action => {
-        next(action)
-        console.log(action)
-    }
-  ])
+  var J = Jackalope({ state: state, actions: actions, model: model }, [ Jackalope.middleware.logger ])
 
   // View libraries usually have nicer ways to add events :)
   document.addEventListener('click', function (evt) {
