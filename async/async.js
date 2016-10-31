@@ -1,34 +1,36 @@
-var base = '@@jackalope/async';
-
+// assume only promises for now... then add stream / callback support
 Jsync.consts = {
-  async: base,
-  start: base + '/start',
-  cancel: base + '/cancel',
-  finish: base + '/finish',
-  fail: base + '/fail',
+  async: '@@jackalope/async',
+  events: [ 'start', 'finish', 'cancel', 'fail' ],
+  // add replace ?
 }
 
-// action handler helpers
-// not bound
+Jsync.will = {}
 Jsync.on = {}
-// for spinners and such:
-//   Jsync.on.start('async-id' )
-Jsync.on.start = function () {}
-Jsync.on.cancel = function () {}
-Jsync.on.finish = function () {}
-Jsync.on.fail = function () {}
+Jsync.consts.events.forEach(function (evt) {
+  Jsync.consts[evt] = Jsync.consts.async + '/' + evt
+  Jsync.will[evt] = will(evt)
+  Jsync.on[evt] = on(evt)
+})
 
-// actions
-// not bound
-// usage:
-//   present(Jsync.start('async-id', promise))
-//   present(Jsync.cancel('async-id'))
-Jsync.start = function (promise) {
+Jsync.start = function (id, process) {
+  return {
+    type: Jsync.consts.start,
+    data: {
+      id: id,
+      process: process,
+    },
+  }
 }
-Jsync.cancel = function () {
+Jsync.cancel = function (id) {
+  return {
+    type: Jsync.consts.cancel,
+    data: {
+      id: id,
+    },
+  }
 }
 
-// not bound
 Jsync.middleware = function (J) {
   var jsync = J[Jsync.consts.async] = Jsync(J.model)
 
@@ -36,23 +38,24 @@ Jsync.middleware = function (J) {
     return function (action) {
       jsync.present(action)
       next(action)
-      jsync.nap(model)
+//      jsync.nap(J.model)
     }
   }
 }
 
+/* does this even need nap?
+Jsync.nap = function (model) {
+  // success / fail events ->
+}
+*/
+
 // bound
 Jsync.present = function (model) {
   return function (action) {
+    console.log(model, action)
     // acts on:
     //   module['@@jackalope/async']
-  }
-}
-
-// bound ???
-Jsync.nap = function (model) {
-  return function () {
-    // success / fail ?
+    // maintains state
   }
 }
 
@@ -63,9 +66,24 @@ function Jsync (model) {
   model[jsync.consts.async] = jsync.model
 
   jsync.present = jsync.present(model)
-  jsync.nap = jsync.present(model)
 
   return jsync
+}
+
+function will (evt) {
+  return function (id, action) {
+    return (action.type === Jsync.consts[evt] && id === action.data.id)
+  }
+}
+
+function on (evt) {
+  return function (id, fn) {
+   return function (action) {
+     if (Jsync.will[evt](id, action)) {
+       return fn(action.data.process)
+     }
+   }
+  }
 }
 
 module.exports = Jsync
