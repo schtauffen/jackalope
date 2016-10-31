@@ -10,7 +10,7 @@
 
 var slice = Array.prototype.slice
 
-Jackalope.version = '0.4.0'
+Jackalope.version = '0.5.0'
 Jackalope.INIT = '@@jackalope/init'
 
 function Jackalope (options) {
