@@ -1,8 +1,7 @@
-// assume only promises for now... then add stream / callback support
+// assumes bluebird promises for now
 Jsync.consts = {
   async: '@@jackalope/async',
   events: [ 'start', 'finish', 'cancel', 'fail' ],
-  // add replace ?
 }
 
 Jsync.will = {}
@@ -38,24 +37,53 @@ Jsync.middleware = function (J) {
     return function (action) {
       jsync.present(action)
       next(action)
-//      jsync.nap(J.model)
     }
   }
 }
 
-/* does this even need nap?
-Jsync.nap = function (model) {
-  // success / fail events ->
-}
-*/
-
-// bound
 Jsync.present = function (model) {
+  // acts on:
+  //   module['@@jackalope/async']
+  var actionHandlers = {}
+
+  // TODO - add finish/fail listeners
+  actionHandlers[Jsync.consts.start] = function (action) {
+    var id = action.data.id
+
+    if (model[id]) {
+      cancel(model[id])
+    }
+
+    model[id] = action.data.process
+  }
+
+  actionHandlers[Jsync.consts.cancel] = function (action) {
+    var id = action.data.id
+
+    if (model[id]) {
+      cancel(model[id])
+      deleteById(action)
+    }
+  }
+
+  actionHandlers[Jsync.consts.fail] = deleteById
+  actionHandlers[Jsync.consts.finish] = deleteById
+
   return function (action) {
-    console.log(model, action)
-    // acts on:
-    //   module['@@jackalope/async']
-    // maintains state
+    var handler = actionHandlers[action.type]
+
+    if (typeof handler === 'function') {
+      handler(action)
+    }
+  }
+
+  function cancel (process) {
+    // TODO - cancel process
+    console.log(process)
+  }
+
+  function deleteById (action) {
+    delete model[action.data.id]
   }
 }
 
@@ -65,7 +93,7 @@ function Jsync (model) {
   jsync.model = {}
   model[jsync.consts.async] = jsync.model
 
-  jsync.present = jsync.present(model)
+  jsync.present = jsync.present(jsync.model)
 
   return jsync
 }
@@ -79,7 +107,7 @@ function will (evt) {
 function on (evt) {
   return function (id, fn) {
    return function (action) {
-     if (Jsync.will[evt](id, action)) {
+     if (id === '*' || Jsync.will[evt](id, action)) {
        return fn(action.data.process)
      }
    }
