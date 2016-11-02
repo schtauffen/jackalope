@@ -1,4 +1,11 @@
-// assumes bluebird promises for now
+/**
+ *  Jackalope/Async - an async utility for Jackalope
+ *	Copyright (c) 2016, Zach Dahl <z.schtauffen@gmail.com>
+ *
+ *	Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
+ *
+ *	THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
 Jsync.consts = {
   async: '@@jackalope/async',
   events: [ 'start', 'finish', 'cancel', 'fail' ],
@@ -12,12 +19,13 @@ Jsync.consts.events.forEach(function (evt) {
   Jsync.on[evt] = on(evt)
 })
 
-Jsync.start = function (id, process) {
+Jsync.start = function (id, process, token) {
   return {
     type: Jsync.consts.start,
     data: {
       id: id,
       process: process,
+      token: token, // required for cancellation
     },
   }
 }
@@ -28,6 +36,25 @@ Jsync.cancel = function (id) {
       id: id,
     },
   }
+}
+
+Jsync.get = function (url, token) {
+  var xhr = new XMLHttpRequest()
+  xhr.open('GET', url)
+
+  return new Promise(function(resolve, reject) {
+    xhr.onload = function () { resolve(xhr.responseText) }
+    xhr.onerror = reject
+
+    if (token) {
+      token.cancel = cancel
+    }
+
+    function cancel () {
+      xhr.abort()
+      reject(new Error(Jsync.consts.cancel))
+    }
+  })
 }
 
 Jsync.middleware = function (J) {
@@ -42,11 +69,8 @@ Jsync.middleware = function (J) {
 }
 
 Jsync.present = function (model) {
-  // acts on:
-  //   module['@@jackalope/async']
   var actionHandlers = {}
 
-  // TODO - add finish/fail listeners
   actionHandlers[Jsync.consts.start] = function (action) {
     var id = action.data.id
 
@@ -54,7 +78,26 @@ Jsync.present = function (model) {
       cancel(model[id])
     }
 
-    model[id] = action.data.process
+    process
+      .then(function (data) {
+        model.present({
+          type: Jsync.consts.finish,
+          data: data,
+        })
+      })
+      .catch(function (err) {
+        if (err.message !== Jsync.consts.cancel) {
+          model.present({
+            type: Jsync.consts.fail,
+            data: err,
+          })
+        }
+      })
+
+    model[id] = {
+      process: action.data.process,
+      token: action.data.token,
+    }
   }
 
   actionHandlers[Jsync.consts.cancel] = function (action) {
@@ -77,9 +120,12 @@ Jsync.present = function (model) {
     }
   }
 
-  function cancel (process) {
-    // TODO - cancel process
-    console.log(process)
+  function cancel (data) {
+    if (data.process && data.process.cancel) {
+      data.process.cancel();
+    } else if (data.token) {
+      data.token()
+    }
   }
 
   function deleteById (action) {
@@ -106,11 +152,11 @@ function will (evt) {
 
 function on (evt) {
   return function (id, fn) {
-   return function (action) {
-     if (id === '*' || Jsync.will[evt](id, action)) {
-       return fn(action.data.process)
-     }
-   }
+    return function (action) {
+      if (id === '*' || Jsync.will[evt](id, action)) {
+        return fn(action.data.process)
+      }
+    }
   }
 }
 
