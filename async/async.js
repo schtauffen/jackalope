@@ -6,6 +6,8 @@
  *
  *	THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+'use strict'
+
 Jsync.consts = {
   async: '@@jackalope/async',
   events: [ 'start', 'finish', 'cancel', 'fail' ],
@@ -38,27 +40,26 @@ Jsync.cancel = function (id) {
   }
 }
 
-Jsync.get = function (url, token) {
+Jsync.get = function (id, url) {
+  var token = {};
   var xhr = new XMLHttpRequest()
   xhr.open('GET', url)
 
-  return new Promise(function(resolve, reject) {
+  var promise = new Promise(function(resolve, reject) {
     xhr.onload = function () { resolve(xhr.responseText) }
     xhr.onerror = reject
-
-    if (token) {
-      token.cancel = cancel
-    }
-
-    function cancel () {
+    token.cancel = function () {
       xhr.abort()
       reject(new Error(Jsync.consts.cancel))
     }
+    xhr.send()
   })
+
+  return Jsync.start(id, promise, token)
 }
 
 Jsync.middleware = function (J) {
-  var jsync = J[Jsync.consts.async] = Jsync(J.model)
+  var jsync = J[Jsync.consts.async] = Jsync(J.options.model, J)
 
   return function (next) {
     return function (action) {
@@ -68,7 +69,7 @@ Jsync.middleware = function (J) {
   }
 }
 
-Jsync.present = function (model) {
+Jsync.present = function (model, J) {
   var actionHandlers = {}
 
   actionHandlers[Jsync.consts.start] = function (action) {
@@ -78,18 +79,24 @@ Jsync.present = function (model) {
       cancel(model[id])
     }
 
-    process
+    action.data.process
       .then(function (data) {
-        model.present({
+        J.present({
           type: Jsync.consts.finish,
-          data: data,
+          data: {
+            id: id,
+            response: data,
+          },
         })
       })
       .catch(function (err) {
         if (err.message !== Jsync.consts.cancel) {
-          model.present({
+          J.present({
             type: Jsync.consts.fail,
-            data: err,
+            data: {
+              id: id,
+              error: err
+            },
           })
         }
       })
@@ -123,8 +130,8 @@ Jsync.present = function (model) {
   function cancel (data) {
     if (data.process && data.process.cancel) {
       data.process.cancel();
-    } else if (data.token) {
-      data.token()
+    } else if (data.token && data.token.cancel) {
+      data.token.cancel()
     }
   }
 
@@ -133,13 +140,13 @@ Jsync.present = function (model) {
   }
 }
 
-function Jsync (model) {
+function Jsync (model, J) {
   var jsync = Object.create(Jsync)
 
   jsync.model = {}
   model[jsync.consts.async] = jsync.model
 
-  jsync.present = jsync.present(jsync.model)
+  jsync.present = jsync.present(jsync.model, J)
 
   return jsync
 }
@@ -154,7 +161,9 @@ function on (evt) {
   return function (id, fn) {
     return function (action) {
       if (id === '*' || Jsync.will[evt](id, action)) {
-        return fn(action.data.process)
+        if (evt === 'finish') return fn(action.data.response)
+        if (evt === 'fail') return fn(action.data.error)
+        return fn()
       }
     }
   }
