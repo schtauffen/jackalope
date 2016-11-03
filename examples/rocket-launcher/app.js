@@ -59,24 +59,24 @@ var model = {
  * model.present is the only thing allowed to change model
  */
 model.present = function (display) {
-  return function (action) {
-    if (action.started) {
+  return function (proposal) {
+    if (proposal.started) {
       model.started = true
       model.launched = false
       model.aborted = false
       model.counter = INITIAL_COUNT
     }
 
-    if (action.aborted) {
+    if (proposal.aborted) {
       model.aborted = true
     }
 
-    if (action.launched) {
+    if (proposal.launched) {
       model.launched = true
     }
 
-    if (typeof action.counter === 'number' && !model.aborted) {
-      model.counter = action.counter
+    if (typeof proposal.counter === 'number' && !model.aborted) {
+      model.counter = proposal.counter
     }
 
     display(model)

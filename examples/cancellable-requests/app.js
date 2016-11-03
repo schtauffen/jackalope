@@ -13,28 +13,29 @@ var actions = function (present) {
 var model = {
   response: '',
   present: function (display) {
-    return function (action) {
+    return function (proposal) {
       Jsync.on.start('my-request', function () {
         model.loading = true
         model.response = ''
-      })(action)
+      })(proposal)
 
       Jsync.on.start('your-request', function () {
         alert('I won\'t ever fire')
-      })(action)
+      })(proposal)
 
       Jsync.on.finish('my-request', function (data) {
         model.loading = false
         model.response = data
-      })(action)
+      })(proposal)
 
       Jsync.on.fail('my-request', function (err) {
         model.loading = false
-      })(action)
+        console.error(err)
+      })(proposal)
 
       Jsync.on.cancel('my-request', function () {
         model.loading = false
-      })(action)
+      })(proposal)
 
       display(model)
     }
@@ -46,7 +47,7 @@ function view (rendered) {
   element.innerHTML = rendered
 }
 
-function state (model, actions) {
+function state (model/*, actions*/) {
   if (model.loading) {
     return view('<p>Loading...</p><button class="request">request again</button><button class="cancel">cancel</button>')
   }
