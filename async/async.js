@@ -62,24 +62,24 @@ Jsync.middleware = function (J) {
   var jsync = J[Jsync.consts.async] = Jsync(J.options.model, J)
 
   return function (next) {
-    return function (action) {
-      jsync.present(action)
-      next(action)
+    return function (proposal) {
+      jsync.present(proposal)
+      next(proposal)
     }
   }
 }
 
 Jsync.present = function (model, J) {
-  var actionHandlers = {}
+  var proposalHandlers = {}
 
-  actionHandlers[Jsync.consts.start] = function (action) {
-    var id = action.data.id
+  proposalHandlers[Jsync.consts.start] = function (proposal) {
+    var id = proposal.data.id
 
     if (model[id]) {
       cancel(model[id])
     }
 
-    action.data.process
+    proposal.data.process
       .then(function (data) {
         J.present({
           type: Jsync.consts.finish,
@@ -102,28 +102,28 @@ Jsync.present = function (model, J) {
       })
 
     model[id] = {
-      process: action.data.process,
-      token: action.data.token,
+      process: proposal.data.process,
+      token: proposal.data.token,
     }
   }
 
-  actionHandlers[Jsync.consts.cancel] = function (action) {
-    var id = action.data.id
+  proposalHandlers[Jsync.consts.cancel] = function (proposal) {
+    var id = proposal.data.id
 
     if (model[id]) {
       cancel(model[id])
-      deleteById(action)
+      deleteById(proposal)
     }
   }
 
-  actionHandlers[Jsync.consts.fail] = deleteById
-  actionHandlers[Jsync.consts.finish] = deleteById
+  proposalHandlers[Jsync.consts.fail] = deleteById
+  proposalHandlers[Jsync.consts.finish] = deleteById
 
-  return function (action) {
-    var handler = actionHandlers[action.type]
+  return function (proposal) {
+    var handler = proposalHandlers[proposal.type]
 
     if (typeof handler === 'function') {
-      handler(action)
+      handler(proposal)
     }
   }
 
@@ -135,8 +135,8 @@ Jsync.present = function (model, J) {
     }
   }
 
-  function deleteById (action) {
-    delete model[action.data.id]
+  function deleteById (proposal) {
+    delete model[proposal.data.id]
   }
 }
 
@@ -152,17 +152,17 @@ function Jsync (model, J) {
 }
 
 function will (evt) {
-  return function (id, action) {
-    return (action.type === Jsync.consts[evt] && id === action.data.id)
+  return function (id, proposal) {
+    return (proposal.type === Jsync.consts[evt] && id === proposal.data.id)
   }
 }
 
 function on (evt) {
   return function (id, fn) {
-    return function (action) {
-      if (id === '*' || Jsync.will[evt](id, action)) {
-        if (evt === 'finish') return fn(action.data.response)
-        if (evt === 'fail') return fn(action.data.error)
+    return function (proposal) {
+      if (id === '*' || Jsync.will[evt](id, proposal)) {
+        if (evt === 'finish') return fn(proposal.data.response)
+        if (evt === 'fail') return fn(proposal.data.error)
         return fn()
       }
     }
