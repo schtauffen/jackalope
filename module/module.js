@@ -1,3 +1,4 @@
+//! source: https://github.com/lhorie/mithril.js/blob/rewrite/module/module.js
 "use strict"
 
 require.$$modules = {}

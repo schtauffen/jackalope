@@ -1,0 +1,15 @@
+{
+  "name": "@jackalope/async",
+  "version": "0.1.0",
+  "description": "middleware for managing async",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Zach Dahl <z.schtauffen@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/schtauffen/jackalope/tree/master/async"
+  },
+  "license": "ISC"
+}
