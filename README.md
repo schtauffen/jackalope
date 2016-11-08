@@ -1,6 +1,6 @@
 # Jackalope
 A modular and microscopic [SAM](http://sam.js.org/)-patterned container  
-It is inspired by [redux](https://github.com/reactjs/redux)  
+It draws inspiration from [redux](https://github.com/reactjs/redux)  
 
 
 ## Installation
@@ -10,7 +10,7 @@ It is inspired by [redux](https://github.com/reactjs/redux)
 ## Usage
 
 Jackalope adheres to the SAM pattern, which can be summarized by the formula:  
-`V = S(vm(M.present(A(M))), nap(M, A))`  
+`V = S(vm(M.present(A(M))), nap(M, A))` ([source](https://www.infoq.com/articles/no-more-mvc-frameworks))  
 
 You can read about SAM here: [http://sam.js.org/](http://sam.js.org/)  
 
@@ -22,18 +22,17 @@ import state from './state'
 import actions from './actions'
 import model from './model'
 
-const J = Jackalope({ state, actions, model }/*, plugins */)
+const J = Jackalope({ state, actions, model }/*, middleware */)
 ```
 
 
 ### State
-In Jackalope, `state` is assumed to be a function with curried form `actions => model => { ... }`.  
-State is responsible for rendering and determing automatic actions, if any.  
+In Jackalope, `state` is a function that receives model as its first parameter. If the function does not specify arguments, or specifies more than 1, it will also receive actions bound automatically during instatiation as the second parameter.
 
 Example:
 ```js
 // src/state.js
-const state = (actions) => (model) => {
+const state = (model, actions) => {
   const representation = 'Oops, you\'ve stumbled upon an impossible state'
 
   if (model.count > 0) {
@@ -54,9 +53,9 @@ export default state
 
 ### Model
 `model` is an object which contains your data. It must have a method, `model.present` which can either accept an action and update itself, or reject actions outright.  
-`model.present` is assumed to have curried form `display => action => { ... }`  
+`model.present` is assumed to have curried form `state => action => { ... }`.
 
-**IMPORTANT** : `model.present` is the only function allowed to mutate model in the SAM pattern.
+**IMPORTANT** : `model.present` is the only function allowed to mutate `model` in the SAM pattern.
 
 Example:
 ```js
@@ -66,18 +65,18 @@ const model = {
   ...
 }
 
-model.present = (display) => (action) => {
-  if (action.type === 'SET_COUNT' && typeof action.payload === 'number') {
-    model.count = action.payload
+model.present = (state) => (action) => {
+  if (action.started) {
+    model.started = true
   }
 
-  if (action.type === 'COUNT_DOWN') {
-    model.count = model.count - 1
+  if (action.aborted) {
+    model.aborted = true
   }
 
   ...
   
-  display(model)
+  state(model)
 }
 
 export default model
@@ -85,19 +84,23 @@ export default model
 
 
 ### Actions
-`actions` should be an object containing pure functions that return instructions for how to update the model.  
-They can be redux-like (as in the following example), but they don't have to be.  
+`actions` should be a function which accepts `present` (as in, `model.present`) as its only parameter.  
+It should return an object with functions that present proposals to the model.  
 
 ```js
 // src/actions.js
-const actions = {}
+const actions = present => ({
+  start: function () {
+    present({ started: true })
+  },
 
-actions.setCount = (n) => ({
-  type: 'SET_COUNT',
-  payload: 10,
+  abort: function () {
+    present({ aborted: true })
+  },
+
+  ...
+
 })
-
-...
 
 export default actions
 ```
