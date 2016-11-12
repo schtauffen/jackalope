@@ -8,9 +8,7 @@
  */
 'use strict'
 
-var slice = Array.prototype.slice
-
-Jackalope.version = '0.5.0'
+Jackalope.version = '0.5.1'
 Jackalope.INIT = '@@jackalope/init'
 
 function Jackalope (options) {
@@ -25,9 +23,14 @@ function Jackalope (options) {
 
   J.options = options
   J.present = options.model.present(state)
+  J.actions = {}
+
+  J.bindActions = function (actions) {
+    Object.assign(J.actions, actions(J.present))
+  }
 
   if (arguments.length > 1) {
-    J.present = slice.call(arguments, 1)
+    J.present = Array.prototype.slice.call(arguments, 1)
       .reduce(function (out, middleware) {
         return out.concat(middleware)
       }, [])
@@ -37,7 +40,7 @@ function Jackalope (options) {
       }, J.present)
   }
 
-  J.actions = options.actions(J.present)
+  J.bindActions(options.actions)
   J.present({ type: J.INIT })
 
   return J
